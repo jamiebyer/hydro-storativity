@@ -93,7 +93,7 @@ app.layout = html.Div([
             id='y_plotting',
             options=[
                 {'label': 'storativity', 'value': 'S'},
-                {'label': 'specific storage', 'value': 'Ss'},
+                {'label': 'specific storage (m\u207B\u00B9)', 'value': 'Ss'},
                 {'label': 'Sw', 'value': 'Sw'}
             ],
             value='S',
@@ -101,7 +101,7 @@ app.layout = html.Div([
         ),
 
         dcc.Markdown('''
-            **Alpha (m^2/N):**
+            **Alpha (m\u00B2/N):**
         '''),
         dcc.RadioItems(
             id='alpha',
