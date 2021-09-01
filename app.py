@@ -34,13 +34,18 @@ app = dash.Dash(
 alpha_df = pd.read_csv('./alpha.csv')
 porosity_df = pd.read_csv('./porosity.csv')
 
+introduction = open('introduction.md', 'r')
+introduction_markdown = introduction.read()
+
+sources = open('sources.md', 'r')
+sources_markdown = sources.read()
+
 app.layout = html.Div([
 
     html.Div([
-        dcc.Markdown('''
-            ### EOSC 325: Storativity
-            ----------
-            '''),
+        dcc.Markdown(
+            children=introduction_markdown
+        ),
     ], style={'width': '100%', 'display': 'inline-block'}),
 
     html.Div([
@@ -164,6 +169,9 @@ app.layout = html.Div([
         )
     ], style={'width': '30%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
+    dcc.Markdown(
+        children=sources_markdown
+    ),
 
 ], style={'width': '1000px'})
 
@@ -190,7 +198,15 @@ def update_plot(y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickness)
         y_values = calc.storativity_water_compressibility(porosity, density, thickness)
 
     fig = go.Figure([go.Bar(x=materials, y=y_values)])
-    fig.update_layout(xaxis_title='Material', yaxis_title='Storativity')
+    fig.update_layout(xaxis_title='Material')
+
+    if y_plotting == 'S':
+        fig.update_layout(xaxis_title='Material', yaxis_title='Storativity')
+    elif y_plotting == 'Ss':
+        fig.update_layout(xaxis_title='Material', yaxis_title='Specific Storage')
+    elif y_plotting == 'Sw':
+        fig.update_layout(xaxis_title='Material', yaxis_title='Storativity due to Compressibility of Water')
+
 
     text = 'Storativity due to compressibility of aquifer (Sa): ' + str(calc.storativity_aquifer_compressibility(density))
 
