@@ -97,9 +97,9 @@ app.layout = html.Div([
         dcc.RadioItems(
             id='y_plotting',
             options=[
-                {'label': 'storativity', 'value': 'S'},
-                {'label': 'specific storage (m\u207B\u00B9)', 'value': 'Ss'},
-                {'label': 'Sw', 'value': 'Sw'}
+                {'label': 'S, storativity', 'value': 'S'},
+                {'label': 'Ss, specific storage', 'value': 'Ss'},
+                {'label': 'Sw, storativity due to compressibility of water', 'value': 'Sw'}
             ],
             value='S',
             style={'margin-bottom': '30px'}
@@ -201,11 +201,11 @@ def update_plot(y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickness)
     fig.update_layout(xaxis_title='Material')
 
     if y_plotting == 'S':
-        fig.update_layout(xaxis_title='Material', yaxis_title='Storativity')
+        fig.update_layout(xaxis_title='Material', yaxis_title='S (dimensionless)')
     elif y_plotting == 'Ss':
-        fig.update_layout(xaxis_title='Material', yaxis_title='Specific Storage')
+        fig.update_layout(xaxis_title='Material', yaxis_title='Ss (m\u207B\u00B9)')
     elif y_plotting == 'Sw':
-        fig.update_layout(xaxis_title='Material', yaxis_title='Storativity due to Compressibility of Water')
+        fig.update_layout(xaxis_title='Material', yaxis_title='Sw (dimensionless)')
 
 
     text = 'Storativity due to compressibility of aquifer (Sa): ' + str(calc.storativity_aquifer_compressibility(density))
