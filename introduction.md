@@ -1,4 +1,4 @@
-### EOSC 325: Storativity
+### Storativity of Aquifers
 
 **Bar graph** shows values based on selected parameters to the right.
 

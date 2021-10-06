@@ -54,7 +54,7 @@ app.layout = html.Div([
         ),
 
         dcc.Markdown(
-            id='Sa_text',
+            children='''Water Compressibility (beta) = 4.40E-10 m\u00B2/N.''',
             style={'margin-left': '30px'}
         ),
 
@@ -178,7 +178,6 @@ app.layout = html.Div([
 
 @app.callback(
     Output(component_id='plot', component_property='figure'),
-    Output(component_id='Sa_text', component_property='children'),
     Input(component_id='y_plotting', component_property='value'),
     Input(component_id='alpha', component_property='value'),
     Input(component_id='porosity', component_property='value'),
@@ -208,9 +207,7 @@ def update_plot(y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickness)
         fig.update_layout(xaxis_title='Material', yaxis_title='Sw (dimensionless)')
 
 
-    text = 'Storativity due to compressibility of aquifer (Sa): ' + str(calc.storativity_aquifer_compressibility(density))
-
-    return fig, text
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=8050)
