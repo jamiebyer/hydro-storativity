@@ -40,6 +40,41 @@ introduction_markdown = introduction.read()
 sources = open('sources.md', 'r')
 sources_markdown = sources.read()
 
+init_y_plotting = 'S'
+init_inp_alpha = 'avg'
+init_inp_porosity = 'mid'
+init_inp_density = 'sea_water'
+init_inp_thickness = 15
+
+
+def initialize_plot(y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickness):
+    materials = ['Clay', 'Sand', 'Gravel', 'Jointed Rock', 'Sound Rock']
+
+    alpha, porosity, density, thickness = calc.alpha(inp_alpha), calc.porosity(inp_porosity), calc.density(
+        inp_density), inp_thickness
+
+    if y_plotting == 'S':
+        y_values = calc.storativity(alpha, porosity, density, thickness)
+    elif y_plotting == 'Ss':
+        y_values = calc.specific_storage(alpha, porosity, density)
+    elif y_plotting == 'Sw':
+        y_values = calc.storativity_water_compressibility(porosity, density, thickness)
+
+    fig = go.Figure([go.Bar(x=materials, y=y_values)])
+    fig.update_layout(xaxis_title='Material')
+
+    if y_plotting == 'S':
+        fig.update_layout(xaxis_title='Material', yaxis_title='S (dimensionless)')
+    elif y_plotting == 'Ss':
+        fig.update_layout(xaxis_title='Material', yaxis_title='Ss (m\u207B\u00B9)')
+    elif y_plotting == 'Sw':
+        fig.update_layout(xaxis_title='Material', yaxis_title='Sw (dimensionless)')
+    fig.update_layout(title='<b>Select parameters, then click "Update Plot."</b>')
+    fig.update_layout(title_pad_l=120)
+    return fig
+
+fig = initialize_plot(init_y_plotting, init_inp_alpha, init_inp_porosity, init_inp_density, init_inp_thickness)
+
 app.layout = html.Div([
 
     html.Div([
@@ -48,9 +83,13 @@ app.layout = html.Div([
         ),
     ], style={'width': '100%', 'display': 'inline-block'}),
 
+
+
+
     html.Div([
         dcc.Graph(
             id='plot',
+            figure=fig
         ),
 
         dcc.Markdown(
@@ -101,7 +140,7 @@ app.layout = html.Div([
                 {'label': 'Ss, specific storage', 'value': 'Ss'},
                 {'label': 'Sw, storativity due to compressibility of water', 'value': 'Sw'}
             ],
-            value='S',
+            value=init_y_plotting,
             style={'margin-bottom': '30px'}
         ),
 
@@ -115,7 +154,7 @@ app.layout = html.Div([
                 {'label': 'avg', 'value': 'avg'},
                 {'label': 'max', 'value': 'max'}
             ],
-            value='avg',
+            value=init_inp_alpha,
             labelStyle={'display': 'inline-block'},
             style={'margin-bottom': '30px'}
         ),
@@ -130,7 +169,7 @@ app.layout = html.Div([
                 {'label': 'middle', 'value': 'mid'},
                 {'label': 'max', 'value': 'max'}
             ],
-            value='mid',
+            value=init_inp_porosity,
             labelStyle={'display': 'inline-block'},
             style={'margin-bottom': '30px'}
         ),
@@ -145,7 +184,7 @@ app.layout = html.Div([
                 {'label': 'sea water (1.025)', 'value': 'sea_water'},
                 {'label': 'brine (1.088)', 'value': 'brine'}
             ],
-            value='sea_water',
+            value=init_inp_density,
             style={'margin-bottom': '30px'}
         ),
 
@@ -165,8 +204,10 @@ app.layout = html.Div([
                 15: '15',
                 30: '30'
             },
-            value=15,
-        )
+            value=init_inp_thickness,
+        ),
+
+        html.Button('Update Plot', id='submit_button', style={'margin-top': '50px'})
     ], style={'width': '30%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
     dcc.Markdown(
@@ -176,38 +217,45 @@ app.layout = html.Div([
 ], style={'width': '1000px'})
 
 
+
 @app.callback(
     Output(component_id='plot', component_property='figure'),
+    Input(component_id='submit_button', component_property='n_clicks'),
+    Input(component_id='plot', component_property='figure'),
     Input(component_id='y_plotting', component_property='value'),
     Input(component_id='alpha', component_property='value'),
     Input(component_id='porosity', component_property='value'),
     Input(component_id='density', component_property='value'),
     Input(component_id='thickness', component_property='value'),
 )
-def update_plot(y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickness):
-    materials = ['Clay', 'Sand', 'Gravel', 'Jointed Rock', 'Sound Rock']
+def update_plot(submit_button, og_fig, y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickness):
+    if (dash.callback_context.triggered[0]['prop_id'].split('.')[0] == 'submit_button'):
 
-    alpha, porosity, density, thickness = calc.alpha(inp_alpha), calc.porosity(inp_porosity), calc.density(inp_density), inp_thickness
+        materials = ['Clay', 'Sand', 'Gravel', 'Jointed Rock', 'Sound Rock']
 
-    if y_plotting == 'S':
-        y_values = calc.storativity(alpha, porosity, density, thickness)
-    elif y_plotting == 'Ss':
-        y_values = calc.specific_storage(alpha, porosity, density)
-    elif y_plotting == 'Sw':
-        y_values = calc.storativity_water_compressibility(porosity, density, thickness)
+        alpha, porosity, density, thickness = calc.alpha(inp_alpha), calc.porosity(inp_porosity), calc.density(inp_density), inp_thickness
 
-    fig = go.Figure([go.Bar(x=materials, y=y_values)])
-    fig.update_layout(xaxis_title='Material')
+        if y_plotting == 'S':
+            y_values = calc.storativity(alpha, porosity, density, thickness)
+        elif y_plotting == 'Ss':
+            y_values = calc.specific_storage(alpha, porosity, density)
+        elif y_plotting == 'Sw':
+            y_values = calc.storativity_water_compressibility(porosity, density, thickness)
 
-    if y_plotting == 'S':
-        fig.update_layout(xaxis_title='Material', yaxis_title='S (dimensionless)')
-    elif y_plotting == 'Ss':
-        fig.update_layout(xaxis_title='Material', yaxis_title='Ss (m\u207B\u00B9)')
-    elif y_plotting == 'Sw':
-        fig.update_layout(xaxis_title='Material', yaxis_title='Sw (dimensionless)')
+        fig = go.Figure([go.Bar(x=materials, y=y_values)])
+        fig.update_layout(xaxis_title='Material')
 
-
-    return fig
+        if y_plotting == 'S':
+            fig.update_layout(xaxis_title='Material', yaxis_title='S (dimensionless)')
+        elif y_plotting == 'Ss':
+            fig.update_layout(xaxis_title='Material', yaxis_title='Ss (m\u207B\u00B9)')
+        elif y_plotting == 'Sw':
+            fig.update_layout(xaxis_title='Material', yaxis_title='Sw (dimensionless)')
+        fig.update_layout(title='<b>Select parameters, then click "Update Plot."</b>')
+        fig.update_layout(title_pad_l=120)
+        return fig
+    else:
+        return og_fig
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=8050)
