@@ -15,7 +15,7 @@ import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
-import dash_table
+from dash import dash_table
 
 import plotly.graph_objects as go
 import calculations as calc
