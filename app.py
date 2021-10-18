@@ -45,6 +45,7 @@ init_inp_alpha = 'avg'
 init_inp_porosity = 'mid'
 init_inp_density = 'sea_water'
 init_inp_thickness = 15
+init_y_axis = 'fitted'
 
 
 def initialize_plot(y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickness):
@@ -71,6 +72,8 @@ def initialize_plot(y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickn
         fig.update_layout(xaxis_title='Material', yaxis_title='Sw (dimensionless)')
     fig.update_layout(title='<b>Select parameters, then click "Update Plot."</b>')
     fig.update_layout(title_pad_l=120)
+
+    fig.update_layout(yaxis_type='log', yaxis_range=[-7, 0])
     return fig
 
 fig = initialize_plot(init_y_plotting, init_inp_alpha, init_inp_porosity, init_inp_density, init_inp_thickness)
@@ -207,7 +210,7 @@ app.layout = html.Div([
             value=init_inp_thickness,
         ),
 
-        html.Button('Update Plot', id='submit_button', style={'margin-top': '50px'})
+        html.Button('Update Plot', id='submit_button', style={'margin-top': '40px', 'margin-bottom': '20px'}),
     ], style={'width': '30%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
     dcc.Markdown(
@@ -230,9 +233,7 @@ app.layout = html.Div([
 )
 def update_plot(submit_button, og_fig, y_plotting, inp_alpha, inp_porosity, inp_density, inp_thickness):
     if (dash.callback_context.triggered[0]['prop_id'].split('.')[0] == 'submit_button'):
-
         materials = ['Clay', 'Sand', 'Gravel', 'Jointed Rock', 'Sound Rock']
-
         alpha, porosity, density, thickness = calc.alpha(inp_alpha), calc.porosity(inp_porosity), calc.density(inp_density), inp_thickness
 
         if y_plotting == 'S':
@@ -253,6 +254,8 @@ def update_plot(submit_button, og_fig, y_plotting, inp_alpha, inp_porosity, inp_
             fig.update_layout(xaxis_title='Material', yaxis_title='Sw (dimensionless)')
         fig.update_layout(title='<b>Select parameters, then click "Update Plot."</b>')
         fig.update_layout(title_pad_l=120)
+
+        fig.update_layout(yaxis_type='log', yaxis_range=[-7, 0])
         return fig
     else:
         return og_fig
